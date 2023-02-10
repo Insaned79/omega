@@ -10,6 +10,7 @@ import config
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.secret_key = 'qqqq'
 
 
 def generate_salt():
@@ -154,10 +155,49 @@ def login():
 def index():
     if 'user_id' not in session or session['access_level'] <= 0:
         return redirect('/login')
+    sections = [("Personal Messages", 1, "personal_messages"),
+                ("Announcements", 2, "announcements"),
+                ("Forums", 1, "forums"),
+                ("User List", 2, "user_list"),
+                ("Files", 1, "files"),
+                ("Fill Out Questionnaire", 2, "questionnaire"),
+                ("Admin Panel", 1, "admin_panel"),
+                ("Logout", 2, "logout")]
+    return render_template('index.html', sections=sections)
 
-    return render_template('index.html', personal_messages=None, announcements=None, forums=None,
-                           user_list=None, files=None, fill_out_questionnaire=None,
-                           admin_panel=None, logout=None)
+@app.route('/personal_messages')
+def personal_messages():
+    return "Personal Messages Page"
+
+@app.route('/announcements')
+def announcements():
+    return "Announcements Page"
+
+@app.route('/forums')
+def forums():
+    return "Forums Page"
+
+@app.route('/user_list')
+def user_list():
+    return "User List Page"
+
+@app.route('/files')
+def files():
+    return "Files Page"
+
+@app.route('/questionnaire')
+def questionnaire():
+    return "Questionnaire Page"
+
+@app.route('/admin_panel')
+def admin_panel():
+    return "Admin Panel Page"
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session.pop('access_level', None)
+    return redirect('/login')
 
 
 if __name__ == '__main__':

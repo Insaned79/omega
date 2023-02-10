@@ -38,6 +38,40 @@ class TestRegisterRoute(TestCase):
         conn.close()
 
 
+class TestLogoutRoute(TestCase):
+    def create_app(self):
+        return app
+
+    def test_logout_route(self):
+        # First, create a test user and log them in
+        self.client.post('/register', data={'username': 'testuser', 'password': 'Passw0rd!', 'password2': 'Passw0rd!'})
+        self.client.post('/login', data={'username': 'testuser', 'password': 'Passw0rd!'})
+
+        # Ensure the user is logged in before attempting to log out
+        with self.client.session_transaction() as session:
+            self.assertIn('user_id', session)
+            self.assertIn('access_level', session)
+
+        # Log out the user
+        response = self.client.get('/logout')
+
+        # Check if the session data was cleared and if the user was redirected to the login page
+        with self.client.session_transaction() as session:
+            self.assertNotIn('user_id', session)
+            self.assertNotIn('access_level', session)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login')
+
+    def tearDown(self):
+        # Connect to the database
+        conn = connect_db()
+        c = conn.cursor()
+        # Delete the test user from the database
+        c.execute("DELETE FROM users WHERE username = 'testuser'")
+        conn.commit()
+        conn.close()
+
+
 class TestLoginRoute(TestCase):
     def create_app(self):
         return app

@@ -1,10 +1,54 @@
-{% extends "base.html" %}
-
-{% block content %}
-  <h2>Sections</h2>
-  <ul>
-    {% for section in sections %}
-      <li><a href="#">{{ section }}</a></li>
-    {% endfor %}
-  </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sections</title>
+    <style>
+        .section-container {
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 0 10px #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .section-column {
+            width: 48%;
+            text-align: center;
+            padding: 20px;
+        }
+        .section-item {
+            margin-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <h1>Welcome</h1>
+    <div class="section-container">
+        <div class="section-column">
+            {% for section in sections %}
+                {% if section[1] == 1 %}
+                    <div class="section-item">
+                        <a href="{{ url_for(section[2]) }}">{{ section[0] }}</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="section-column">
+            {% for section in sections %}
+                {% if section[1] == 2 %}
+                    <div class="section-item">
+                        <a href="{{ url_for(section[2]) }}">{{ section[0] }}</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
+</body>
+</html>
