@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Sections</h2>
+  <ul>
+    {% for section in sections %}
+      <li><a href="#">{{ section }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

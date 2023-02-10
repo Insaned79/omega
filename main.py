@@ -1,8 +1,7 @@
+import datetime
 import sqlite3
 import hashlib
 import re
-import random
-import string
 import base64
 import os
 from flask import Flask, request, redirect, render_template, session
@@ -11,6 +10,7 @@ import config
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
 
 def generate_salt():
     random_bytes = os.urandom(16)
@@ -65,8 +65,12 @@ def register():
             return "Error: Passwords do not match."
 
         # Check if the password is strong enough
-        if not re.match(r'[A-Za-z0-9@#$%^&+=]{8,}', password.decode()):
-            return "Error: Password is not strong enough. It must contain at least 8 characters, including uppercase and lowercase letters, numbers, and symbols (@#$%^&+=)."
+        # if not re.match(r'[A-Za-z0-9@#$%^&+=]{8,}', password.decode()):
+        if len(password) < 8 or re.search("[a-z]+", password.decode()) is None or re.search("[A-Z]+",
+                                                                                            password.decode()) is None \
+                or re.search("[0-9]+", password.decode()) is None:
+            return "Error: Password is not strong enough. It must contain at least 8 characters, including uppercase " \
+                   "and lowercase letters, numbers, and symbols (@#$%^&+=)."
 
         # Generate a random salt
         salt = generate_salt()
@@ -110,7 +114,8 @@ def login():
         c = conn.cursor()
 
         # Get the user from the database
-        c.execute("SELECT id, username, password, access_level, salt FROM users WHERE lower(username)=?", (username.lower(),))
+        c.execute("SELECT id, username, password, access_level, salt FROM users WHERE lower(username)=?",
+                  (username.lower(),))
         user = c.fetchone()
         conn.close()
 
@@ -122,18 +127,37 @@ def login():
         salt = user[4]
         hash_object = hashlib.sha256((password + salt.encode('utf-8')))
         hex_dig = hash_object.hexdigest()
-        print(salt)
+
         # Check if the password is correct
         if hex_dig != user[2]:
             return "Error: Incorrect password."
+
+        # Check if the user's access level is banned (0)
+        if user[3] == 0:
+            return "Error: Your account is banned."
 
         # Save the user's id and access level in the session
         session['user_id'] = user[0]
         session['access_level'] = user[3]
 
+        # Update the last login date
+        conn = connect_db()
+        c = conn.cursor()
+        current_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        c.execute("UPDATE users SET last_login_date=? WHERE id=?", (current_date, user[0]))
+        conn.commit()
         return redirect('/')
 
     return render_template('login.html')
+
+@app.route('/')
+def index():
+    if 'user_id' not in session or session['access_level'] <= 0:
+        return redirect('/login')
+
+    return render_template('index.html', personal_messages=None, announcements=None, forums=None,
+                           user_list=None, files=None, fill_out_questionnaire=None,
+                           admin_panel=None, logout=None)
 
 
 if __name__ == '__main__':
