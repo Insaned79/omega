@@ -1,0 +1,3 @@
+DB_NAME = 'omega.db'
+ADMIN_LEVEL = 100
+DEFAULT_LEVEL = 10

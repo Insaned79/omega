@@ -1,0 +1,46 @@
+<!-- base.html -->
+<html>
+    <head>
+        <title>Omega BBS</title>
+        <style>
+            body {
+                background-color: #2e2e2e;
+                color: #ffffff;
+                font-family: "Courier New", Courier, monospace;
+            }
+            h2 {
+                text-align: center;
+                margin: 50px 0 20px 0;
+            }
+            form {
+                width: 500px;
+                margin: 0 auto;
+            }
+            input[type="text"], input[type="password"], input[type="email"] {
+                padding: 10px;
+                font-size: 16px;
+                margin-bottom: 20px;
+                width: 100%;
+                box-sizing: border-box;
+                border-radius: 5px;
+                border: none;
+                background-color: #333333;
+                color: #ffffff;
+            }
+            input[type="submit"] {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+                background-color: #008000;
+                color: #ffffff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
